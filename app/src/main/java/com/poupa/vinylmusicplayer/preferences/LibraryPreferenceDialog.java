@@ -1,10 +1,13 @@
 package com.poupa.vinylmusicplayer.preferences;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -42,8 +45,29 @@ public class LibraryPreferenceDialog extends DialogFragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(adapter);
 
+        final Activity activity = requireActivity();
+
         adapter.attachToRecyclerView(recyclerView);
 
+        AlertDialog.Builder alert = new AlertDialog.Builder(activity);
+        alert.setTitle(R.string.library_categories);
+        LayoutInflater inflater = this.getLayoutInflater();
+        //View parent = inflater.inflate(R.layout.preference_dialog_export_settings, null);
+        alert.setView(view);
+        alert.setNeutralButton(R.string.reset_action, (dialog, id) -> {
+            adapter.setCategoryInfos(PreferenceUtil.getInstance().getDefaultLibraryCategoryInfos());
+        });
+        alert.setPositiveButton(android.R.string.ok, (dialog, id) -> {
+            updateCategories(adapter.getCategoryInfos());
+            dismiss();
+        });
+        alert.setNegativeButton(android.R.string.cancel, (dialog, id) -> {
+            dismiss();
+        });
+
+        return alert.create();
+
+        /*
         return new MaterialDialog.Builder(getContext())
                 .title(R.string.library_categories)
                 .customView(view, false)
@@ -57,7 +81,7 @@ public class LibraryPreferenceDialog extends DialogFragment {
                     updateCategories(adapter.getCategoryInfos());
                     dismiss();
                 })
-                .build();
+                .build();*/
     }
 
     @Override

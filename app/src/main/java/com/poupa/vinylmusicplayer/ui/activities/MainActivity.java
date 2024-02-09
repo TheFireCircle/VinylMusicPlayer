@@ -74,6 +74,7 @@ public class MainActivity extends AbsSlidingMusicPanelActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //getTheme().applyStyle(R.style.Overlay);
         setDrawUnderStatusbar();
 
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT) {
