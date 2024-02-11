@@ -8,6 +8,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -55,20 +56,15 @@ public class PreAmpPreferenceDialog extends DialogFragment implements SeekBar.On
         seekbarWithoutRg.getProgressDrawable().setColorFilter(color, PorterDuff.Mode.SRC_IN);
         seekbarWithoutRg.getThumb().setColorFilter(color, PorterDuff.Mode.SRC_IN);
 
-        return new MaterialDialog.Builder(getContext())
-                .title(R.string.pref_title_rg_preamp)
-                .positiveText(android.R.string.ok)
-                .negativeText(android.R.string.cancel)
-                .autoDismiss(false)
-                .onNegative((dialog, which) -> dismiss())
-                .onPositive((dialog, which) -> updateAndClose())
-                .customView(view, false)
-                .build();
-    }
+        return new AlertDialog.Builder(requireActivity())
+                .setTitle(R.string.pref_title_rg_preamp)
+                .setView(view)
+                .setPositiveButton(android.R.string.ok, null)
+                .setNegativeButton(android.R.string.cancel, (dialog, id) -> {
+                    PreferenceUtil.getInstance().setReplayGainPreamp(withRgValue, withoutRgValue);
+                })
+                .create();
 
-    private void updateAndClose() {
-        PreferenceUtil.getInstance().setReplayGainPreamp(withRgValue, withoutRgValue);
-        dismiss();
     }
 
     private void updateLabelWithRg() {

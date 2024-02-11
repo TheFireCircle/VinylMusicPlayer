@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.util.Pair;
 import androidx.fragment.app.DialogFragment;
 
@@ -122,28 +123,27 @@ public class SmartPlaylistPreferenceDialog extends DialogFragment {
         });
         innerLowerLayout.addView(isDisabledCheckbox);
 
-        return new MaterialDialog.Builder(context)
-                .title(prefName)
-                .positiveText(android.R.string.ok)
-                .negativeText(android.R.string.cancel)
-                .customView(outerLayout, false)
-                .autoDismiss(false)
-                .onPositive((materialDialog, dialogAction) -> {
+        return new AlertDialog.Builder(requireActivity())
+                .setTitle(prefName)
+                .setView(outerLayout)
+                .setPositiveButton(android.R.string.ok, (dialog, id) -> {
                     @SuppressLint("DefaultLocale")
                     final String newPrefValue = isDisabledCheckbox.isChecked()
                             ? "0d"
                             : String.format("%d%s",
-                                    valueInput.getValue(),
-                                    POSSIBLE_TIME_UNITS[unitInput.getValue()].preferencePostfix
-                            );
+                            valueInput.getValue(),
+                            POSSIBLE_TIME_UNITS[unitInput.getValue()].preferencePostfix
+                    );
                     PreferenceManager.getDefaultSharedPreferences(context)
                             .edit()
                             .putString(preferenceKey, newPrefValue)
                             .apply();
 
+                })
+                .setNegativeButton(android.R.string.cancel, (dialog, id) -> {
                     dismiss();
                 })
-                .onNegative((materialDialog, dialogAction) -> dismiss())
-                .build();
+                .create();
+
     }
 }
