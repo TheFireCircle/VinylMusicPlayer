@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatDialog;
 import androidx.fragment.app.DialogFragment;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
@@ -20,6 +23,7 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.heinrichreimersoftware.materialintro.view.InkPageIndicator;
 import com.poupa.vinylmusicplayer.R;
+import com.poupa.vinylmusicplayer.provider.BlacklistStore;
 import com.poupa.vinylmusicplayer.ui.fragments.player.NowPlayingScreen;
 import com.poupa.vinylmusicplayer.util.PreferenceUtil;
 import com.poupa.vinylmusicplayer.util.ViewUtil;
@@ -27,9 +31,9 @@ import com.poupa.vinylmusicplayer.util.ViewUtil;
 /**
  * @author Karim Abou Zeid (kabouzeid)
  */
-public class NowPlayingScreenPreferenceDialog extends DialogFragment implements MaterialDialog.SingleButtonCallback, ViewPager.OnPageChangeListener {
+public class NowPlayingScreenPreferenceDialog extends DialogFragment implements DialogInterface.OnClickListener, ViewPager.OnPageChangeListener {
 
-    private DialogAction whichButtonClicked;
+    private int whichButtonClicked;
     private int viewPagerPosition;
 
     public static NowPlayingScreenPreferenceDialog newInstance() {
@@ -50,24 +54,23 @@ public class NowPlayingScreenPreferenceDialog extends DialogFragment implements 
         pageIndicator.setViewPager(viewPager);
         pageIndicator.onPageSelected(viewPager.getCurrentItem());
 
-        return new MaterialDialog.Builder(getContext())
-                .title(R.string.pref_title_now_playing_screen_appearance)
-                .positiveText(android.R.string.ok)
-                .negativeText(android.R.string.cancel)
-                .onAny(this)
-                .customView(view, false)
-                .build();
+        return new AlertDialog.Builder(requireActivity())
+                .setTitle(R.string.pref_title_now_playing_screen_appearance)
+                .setView(view)
+                .setPositiveButton(android.R.string.ok, this::onClick)
+                .setNegativeButton(android.R.string.cancel, this::onClick)
+                .create();
     }
 
     @Override
-    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+    public void onClick(DialogInterface dialogInterface, int which) {
         whichButtonClicked = which;
     }
 
     @Override
     public void onDismiss(@NonNull DialogInterface dialog) {
         super.onDismiss(dialog);
-        if (whichButtonClicked == DialogAction.POSITIVE) {
+        if (whichButtonClicked == AlertDialog.BUTTON_POSITIVE) {
             PreferenceUtil.getInstance().setNowPlayingScreen(NowPlayingScreen.values()[viewPagerPosition]);
         }
     }

@@ -66,22 +66,6 @@ public class LibraryPreferenceDialog extends DialogFragment {
         });
 
         return alert.create();
-
-        /*
-        return new MaterialDialog.Builder(getContext())
-                .title(R.string.library_categories)
-                .customView(view, false)
-                .positiveText(android.R.string.ok)
-                .negativeText(android.R.string.cancel)
-                .neutralText(R.string.reset_action)
-                .autoDismiss(false)
-                .onNeutral((dialog, action) -> adapter.setCategoryInfos(PreferenceUtil.getInstance().getDefaultLibraryCategoryInfos()))
-                .onNegative((dialog, action) -> dismiss())
-                .onPositive((dialog, action) -> {
-                    updateCategories(adapter.getCategoryInfos());
-                    dismiss();
-                })
-                .build();*/
     }
 
     @Override
