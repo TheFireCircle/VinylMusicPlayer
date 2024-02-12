@@ -24,6 +24,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Interpolator;
 
+import com.poupa.vinylmusicplayer.model.Song;
+
+import java.util.List;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -117,6 +121,64 @@ public class SongPlayCountStore extends SQLiteOpenHelper {
             sInstance = new SongPlayCountStore(context.getApplicationContext());
         }
         return sInstance;
+    }
+
+    public void addSongId(final long songId) {
+        if (songId == Song.EMPTY_SONG.id) {
+            return;
+        }
+        addSongIds(List.of(songId));
+    }
+
+    public void addSongIds(@NonNull List<Long> songIds) {
+        if (songIds.isEmpty()) {
+            return;
+        }
+
+        final SQLiteDatabase database = getWritableDatabase();
+        database.beginTransaction();
+
+        try {
+            long importTime = System.currentTimeMillis();
+            final ContentValues values = new ContentValues(2);
+
+            for (long songId : songIds) {
+                // remove previous entries
+                removeSongId(database, songId);
+
+                // add the entry
+                values.clear();
+                values.put(SongPlayCountColumns.ID, songId);
+                values.put(SongPlayCountColumns.LAST_UPDATED_WEEK_INDEX, importTime);
+                values.put(SongPlayCountColumns.WEEK_PLAY_COUNT, importTime);
+                values.put(SongPlayCountColumns.PLAY_COUNT_SCORE, importTime);
+                database.insert(SongPlayCountStore.SongPlayCountColumns.NAME, null, values);
+            }
+        } finally {
+            database.setTransactionSuccessful();
+            database.endTransaction();
+        }
+    }
+
+    public void removeSongIds(@NonNull List<Long> missingIds) {
+        if (missingIds.isEmpty()) return;
+
+        final SQLiteDatabase database = getWritableDatabase();
+        database.beginTransaction();
+        try {
+            for (long id : missingIds) {
+                removeSongId(database, id);
+            }
+        } finally {
+            database.setTransactionSuccessful();
+            database.endTransaction();
+        }
+    }
+
+    private void removeSongId(@NonNull final SQLiteDatabase database, final long songId) {
+        database.delete(SongPlayCountStore.SongPlayCountColumns.NAME, SongPlayCountStore.SongPlayCountColumns.ID + " = ?", new String[]{
+                String.valueOf(songId)
+        });
     }
 
     /**
